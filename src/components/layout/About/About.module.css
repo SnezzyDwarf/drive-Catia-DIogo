@@ -1,0 +1,99 @@
+.about {
+  width: 100%;
+  height: auto;
+}
+
+.content {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+
+.containerImage {
+  width: 100%;
+  max-width: 750px;
+  display: flex;
+  position: relative;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+/* Camada rosa por cima da imagem */
+.containerImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle,
+    var(--color-black-soft),
+    var(--color-pink-dark)
+  );
+  opacity: 0.4;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Bloco do título (h2 + coração) centrado no meio da imagem */
+.title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-40deg);
+  z-index: 2;
+  width: 100%;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+  font-weight: 400;
+  color: white;
+}
+
+.title h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-family: var(--font-ui);
+  font-weight: 400;
+}
+
+.heartIcon {
+  width: clamp(1.75rem, 3vw, 2.5rem);
+  height: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.features {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.feature svg {
+  width: 4rem;
+  height: 4rem;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .content {
+    flex-direction: column;
+  }
+  .image {
+    height: 325px;
+  }
+}

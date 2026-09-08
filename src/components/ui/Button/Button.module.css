@@ -1,0 +1,40 @@
+.button {
+  border: none;
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-lg);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ctaBlack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border-radius: 12px;
+  background-color: var(--color-black-soft);
+  color: var(--color-pink-light);
+  transition: all 0.4s ease-in;
+}
+
+.ctaBlack:hover {
+  background-color: var(--color-pink-dark);
+  color: var(--color-black-soft);
+}
+
+.ctaBlackHero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 250px;
+  gap: var(--space-sm);
+  border-radius: 12px;
+  background-color: var(--color-black-soft);
+  color: var(--color-pink-light);
+  transition: all 0.4s ease-in;
+}
+
+.ctaBlackHero:hover {
+  background-color: var(--color-pink-dark);
+  color: var(--color-black-soft);
+}

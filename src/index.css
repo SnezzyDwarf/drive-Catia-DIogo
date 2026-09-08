@@ -1,0 +1,158 @@
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap");
+
+:root {
+  /*====== COLORS =======*/
+
+  /*====== PRiMARY ======*/
+  --color-pink: #f3d6d6;
+  --color-pink-light: #f9e9e9;
+  --color-pink-dark: #d9aaaa;
+
+  /*====== Secondary ======*/
+  --color-black: #111111;
+  --color-black-soft: #181616;
+  --color-white: #ffffff;
+  --color-cream: #faf6f4;
+
+  /* Text */
+  --color-text-primary: #111111;
+  --color-text-secondary: #5f5757;
+  --color-text-light: #f8f4f2;
+
+  /* Borders */
+  --color-border-light: #e7cccc;
+  --color-border-dark: #4a4141;
+
+  /*===text====*/
+  --fs-h1: clamp(2rem, 5vw, 3.2rem);
+  --fs-h2: clamp(1.4rem, 3vw, 2rem);
+  --fs-h3: clamp(1.1rem, 2vw, 1.4rem);
+
+  --fs-body: clamp(0.95rem, 1vw + 0.25rem, 1.15rem);
+
+  /*======Font-family=====*/
+  --font-heading: "Cormorant Garamond", serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-ui: "Allura", cursive;
+
+  /*===== Espaçamentos==== */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+}
+
+/*
+Uso	                  Unidade	    Valores seguros
+Hero height	          vh	            50–70vh
+Section padding	      vh	            6–12vh
+Card  width	          vw	            20–30vw
+Card  height	        vw	            18–25vw
+Ícones                vw	            10–15vw
+Texto	                vw	            2–5vw (com clamp)*/
+
+/* ==== CSS RESET / BASE ==== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text);
+  background-color: #f3d1d0;
+  text-rendering: optimizeLegibility;
+}
+
+/*usei neste caso para ter 100% de altura de ecra*/
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* Improve text wrapping */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/*========fonts-family==========*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+button,
+input,
+textarea,
+select,
+label,
+p {
+  font-family: var(--font-body);
+}
+
+/*=====Font-size========*/
+h1 {
+  font-size: var(--fs-h1);
+}
+
+h2 {
+  font-size: var(--fs-h2);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+}
+
+p {
+  font-size: var(--fs-body);
+}

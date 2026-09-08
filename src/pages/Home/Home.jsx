@@ -1,10 +1,14 @@
+import About from "../../components/layout/About/About";
+import Explore from "../../components/layout/ExploreHome/Explore";
+import HeroHome from "../../components/layout/HeroHome/HeroHome";
 import "./Home.css";
 
 function Page1() {
   return (
     <section className="page1">
-      <h1>Home</h1>
-      <p>Conteúdo da primeira página.</p>
+      <HeroHome />
+      <Explore />
+      <About />
     </section>
   );
 }

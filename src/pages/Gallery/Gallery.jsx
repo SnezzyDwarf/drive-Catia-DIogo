@@ -1,10 +1,12 @@
+import Gallery from "../../components/layout/Gallery/Gallery";
+import HeroGallery from "../../components/layout/HeroGallery/HeroGallery";
 import "./Gallery.css";
 
 function Page2() {
   return (
     <section className="page2">
-      <h1>Page 2</h1>
-      <p>Conteúdo da segunda página.</p>
+      <HeroGallery />
+      <Gallery />
     </section>
   );
 }

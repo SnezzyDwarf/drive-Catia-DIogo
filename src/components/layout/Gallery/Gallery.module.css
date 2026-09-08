@@ -1,0 +1,229 @@
+/* ====== Grelha de fotos ====== */
+.gallery {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--space-lg) 2rem 5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 9rem;
+  grid-auto-flow: dense;
+  gap: var(--space-md);
+}
+
+.gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  grid-row: span 2;
+  border-radius: 16px;
+  cursor: zoom-in;
+  box-shadow:
+    0 0 0 1px rgba(231, 204, 204, 0.55),
+    0 10px 24px -12px rgba(17, 17, 17, 0.28);
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.4s ease, filter 0.4s ease;
+}
+
+/* Ritmo do mosaico: alternar fotos largas e altas */
+.gallery img:nth-child(7n + 1) {
+  grid-column: span 2;
+}
+
+.gallery img:nth-child(7n + 3) {
+  grid-row: span 3;
+}
+
+.gallery img:hover {
+  transform: translateY(-6px) scale(1.02);
+  filter: brightness(1.05) saturate(1.05);
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(217, 170, 170, 0.8),
+    0 24px 44px -16px rgba(217, 170, 170, 0.5);
+}
+
+/* ====== Lightbox ====== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  background:
+    radial-gradient(
+        circle at 50% 42%,
+        rgba(217, 170, 170, 0.14),
+        transparent 55%
+      )
+      rgba(17, 17, 17, 0.94);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease;
+}
+
+.fullImage {
+  max-width: min(90vw, 1100px);
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(249, 233, 233, 0.18),
+    0 30px 80px -20px rgba(0, 0, 0, 0.65);
+  animation: zoomIn 0.3s ease;
+}
+
+.close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(243, 214, 214, 0.35);
+  border-radius: 50%;
+  background-color: rgba(24, 22, 22, 0.6);
+  color: var(--color-pink-light);
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.close:hover {
+  background-color: var(--color-pink-dark);
+  color: var(--color-black-soft);
+  transform: rotate(90deg);
+}
+
+/* Botões anterior / seguinte */
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(243, 214, 214, 0.35);
+  border-radius: 50%;
+  background-color: rgba(24, 22, 22, 0.6);
+  color: var(--color-pink-light);
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.prev {
+  left: clamp(0.75rem, 3vw, 2rem);
+}
+
+.next {
+  right: clamp(0.75rem, 3vw, 2rem);
+}
+
+.prev:hover,
+.next:hover {
+  background-color: var(--color-pink-dark);
+  color: var(--color-black-soft);
+}
+
+.prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+.download {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vw, 2.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-sm) var(--space-lg);
+  background-color: var(--color-black-soft);
+  color: var(--color-pink-light);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(243, 214, 214, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.4s ease-in, color 0.4s ease-in;
+}
+
+.download:hover {
+  background-color: var(--color-pink-dark);
+  color: var(--color-black-soft);
+}
+
+/* ====== Animações ====== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 900px) {
+  .gallery {
+    padding: var(--space-lg) var(--space-md) 4rem;
+    gap: var(--space-sm);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 7rem;
+  }
+
+  /* Em telemóvel: grelha uniforme (mais limpa em ecrãs pequenos) */
+  .gallery img:nth-child(7n + 1),
+  .gallery img:nth-child(7n + 3) {
+    grid-column: auto;
+    grid-row: span 2;
+  }
+
+  .gallery img {
+    border-radius: 12px;
+  }
+
+  .prev,
+  .next {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+/* ====== Acessibilidade ====== */
+@media (prefers-reduced-motion: reduce) {
+  .gallery img,
+  .lightbox,
+  .fullImage,
+  .close,
+  .download {
+    animation: none;
+    transition: none;
+  }
+}
