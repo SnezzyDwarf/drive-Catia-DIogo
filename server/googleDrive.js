@@ -5,6 +5,7 @@ const auth = new GoogleAuth({
   keyFile: process.env.RENDER
     ? "/etc/secrets/service-account.json"
     : "./server/credentials/service-account.json",
+  scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 
 const drive = google.drive({
