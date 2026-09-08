@@ -19,11 +19,18 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // Sessão
+app.set("trust proxy", 1);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
   }),
 );
 
@@ -82,7 +89,9 @@ function requireAuth(req, res, next) {
 
 // Google Drive
 const auth = new GoogleAuth({
-  keyFile: "./server/credentials/service-account.json",
+  keyFile: process.env.RENDER
+    ? "/etc/secrets/service-account.json"
+    : "./server/credentials/service-account.json",
   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 

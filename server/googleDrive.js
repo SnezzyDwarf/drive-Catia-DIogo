@@ -2,8 +2,9 @@ import { GoogleAuth } from "google-auth-library";
 import { google } from "googleapis";
 
 const auth = new GoogleAuth({
-  keyFile: "./server/credentials/service-account.json",
-  scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+  keyFile: process.env.RENDER
+    ? "/etc/secrets/service-account.json"
+    : "./server/credentials/service-account.json",
 });
 
 const drive = google.drive({
