@@ -40,9 +40,15 @@ function Navbar() {
       </div>
 
       <div className={styles.cta}>
-        <Button variant="ctaBlack">
-          <GoogleDriveIcon /> Aceder à Drive
-        </Button>
+        <a
+          href="https://drive.google.com/drive/u/1/folders/1_NY0CPR3-_tOp-Evu6s0pJAkplPPeJjY"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="ctaBlack">
+            <GoogleDriveIcon /> Aceder à Drive
+          </Button>
+        </a>
       </div>
 
       {/* Botão hambúrguer (apenas mobile) */}
