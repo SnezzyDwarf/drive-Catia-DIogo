@@ -1,9 +1,13 @@
+import { useNavigate } from "react-router";
+
 import HeroImage from "../../../assets/images/HeroHome.jpg";
 import Button from "../../ui/Button/Button";
 
 import styles from "./HeroHome.module.css";
 
 export default function HeroHome() {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.hero}>
       <div className={styles.content}>
@@ -16,7 +20,9 @@ export default function HeroHome() {
             Fotos e vídeos num único lugar. Para reviver cada <br />
             Momento
           </p>
-          <Button variant="ctaBlackHero">Ver Fotos </Button>
+          <Button variant="ctaBlackHero" onClick={() => navigate("/gallery")}>
+            Ver Fotos
+          </Button>
         </div>
         <div className={styles.containerImage}>
           <img
