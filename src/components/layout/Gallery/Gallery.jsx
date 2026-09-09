@@ -5,6 +5,7 @@ import styles from "./Gallery.module.css";
 function Gallery() {
   const [photos, setPhotos] = useState([]);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPhotos() {
@@ -22,6 +23,8 @@ function Gallery() {
         setPhotos(data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -46,6 +49,42 @@ function Gallery() {
     setSelectedPhoto(photos[(selectedIndex + 1) % photos.length]);
   };
 
+  if (loading) {
+    return (
+      <div className={styles.loader} role="status" aria-live="polite">
+        <div className={styles.loaderMonogram} aria-hidden="true">
+          <span>C</span>
+          <svg
+            className={styles.loaderHeart}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+          <span>D</span>
+        </div>
+
+        <p className={styles.loaderDate}>04-09-2026</p>
+
+        <p className={styles.loaderText}>
+          A carregar as fotografias
+          <span className={styles.loaderDots} aria-hidden="true">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </span>
+        </p>
+
+        <div className={styles.skeletonGrid} aria-hidden="true">
+          {Array.from({ length: 12 }, (_, index) => (
+            <div key={index} className={styles.skeletonItem} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className={styles.gallery}>
@@ -55,6 +94,7 @@ function Gallery() {
             src={`/api/photos/${photo.id}/thumbnail`}
             alt={photo.name}
             onClick={() => setSelectedPhoto(photo)}
+            loading="lazy"
           />
         ))}
       </div>

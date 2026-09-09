@@ -26,11 +26,12 @@ export default function Explore() {
         </div>
         <div className={styles.container}>
           <ExportIcon />
-          <h3>Exportar (BREVEMENTE)</h3>
+          <h3>Carregar</h3>
           <p>
-            Podes enviar o que tiveres. <br />
-            Mas atenção fica <br />
-            disponivel para toda a gente
+            Para adicionar as suas fotos, carregue em aceder a drive, abra a
+            pasta e carregue em + Novo. Escolha Carregar ficheiros, selecione as
+            fotografias e videos que pretende partilhar e, no final, carregue em
+            Carregar. Por favor escolha as pastas correctas
           </p>
         </div>
       </div>

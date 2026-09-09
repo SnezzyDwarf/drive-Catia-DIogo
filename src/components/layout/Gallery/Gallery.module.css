@@ -168,6 +168,96 @@
   color: var(--color-black-soft);
 }
 
+/* ====== Loader (a carregar as fotografias) ====== */
+.loader {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(3rem, 9vh, 5.5rem) 2rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: fadeIn 0.4s ease;
+}
+
+.loaderMonogram {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-black-soft);
+}
+
+.loaderHeart {
+  width: 0.62em;
+  height: 0.62em;
+  color: var(--color-pink-dark);
+  filter: drop-shadow(0 6px 14px rgba(217, 170, 170, 0.7));
+  animation: heartbeat 1.6s ease-in-out infinite;
+}
+
+.loaderDate {
+  font-family: var(--font-ui);
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  color: var(--color-pink-dark);
+}
+
+.loaderText {
+  margin-top: var(--space-md);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.loaderDots span {
+  display: inline-block;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.loaderDots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loaderDots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Grelha de placeholders com o mesmo ritmo do mosaico real */
+.skeletonGrid {
+  width: 100%;
+  margin-top: var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 9rem;
+  grid-auto-flow: dense;
+  gap: var(--space-md);
+}
+
+.skeletonItem {
+  grid-row: span 2;
+  border-radius: 16px;
+  background: linear-gradient(
+    100deg,
+    rgba(231, 204, 204, 0.28) 35%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(231, 204, 204, 0.28) 65%
+  );
+  background-size: 220% 100%;
+  box-shadow: 0 0 0 1px rgba(231, 204, 204, 0.4);
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.skeletonGrid .skeletonItem:nth-child(7n + 1) {
+  grid-column: span 2;
+}
+
+.skeletonGrid .skeletonItem:nth-child(7n + 3) {
+  grid-row: span 3;
+}
+
 /* ====== Animações ====== */
 @keyframes fadeIn {
   from {
@@ -186,6 +276,47 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.22);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.14);
+  }
+  60% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes dotBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
   }
 }
 
@@ -209,6 +340,22 @@
     border-radius: 12px;
   }
 
+  .skeletonGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 7rem;
+    gap: var(--space-sm);
+  }
+
+  .skeletonGrid .skeletonItem:nth-child(7n + 1),
+  .skeletonGrid .skeletonItem:nth-child(7n + 3) {
+    grid-column: auto;
+    grid-row: span 2;
+  }
+
+  .skeletonItem {
+    border-radius: 12px;
+  }
+
   .prev,
   .next {
     width: 2.25rem;
@@ -222,7 +369,11 @@
   .lightbox,
   .fullImage,
   .close,
-  .download {
+  .download,
+  .loader,
+  .loaderHeart,
+  .loaderDots span,
+  .skeletonItem {
     animation: none;
     transition: none;
   }
