@@ -83,9 +83,15 @@ function Navbar() {
             {item.label}
           </NavLink>
         ))}
-        <Button variant="ctaBlack" onClick={closeMenu}>
-          <GoogleDriveIcon /> Aceder à Drive
-        </Button>
+        <a
+          href="https://drive.google.com/drive/u/1/folders/1_NY0CPR3-_tOp-Evu6s0pJAkplPPeJjY"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="ctaBlack" onClick={closeMenu}>
+            <GoogleDriveIcon /> Aceder à Drive
+          </Button>
+        </a>
       </div>
     </nav>
   );
