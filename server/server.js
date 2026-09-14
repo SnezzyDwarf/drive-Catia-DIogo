@@ -7,18 +7,23 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { getPhotos } from "./googleDrive.js";
-
-import { google } from "googleapis";
-import { GoogleAuth } from "google-auth-library";
+import { testR2Connection, getR2SignedUrl } from "./r2.js";
 
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ==========================================
+// SERVIR O REACT
+// ==========================================
+
 app.use(express.static(path.join(__dirname, "../dist")));
 
-// Sessão
+// ==========================================
+// SESSÃO
+// ==========================================
+
 app.set("trust proxy", 1);
 
 app.use(
@@ -34,7 +39,10 @@ app.use(
   }),
 );
 
+// ==========================================
 // CORS
+// ==========================================
+
 app.use(
   cors({
     origin: true,
@@ -42,10 +50,16 @@ app.use(
   }),
 );
 
-// Ler JSON enviado pelo React
+// ==========================================
+// JSON
+// ==========================================
+
 app.use(express.json());
 
+// ==========================================
 // LOGIN
+// ==========================================
+
 app.post("/api/login", (req, res) => {
   const { password } = req.body;
 
@@ -63,7 +77,10 @@ app.post("/api/login", (req, res) => {
   });
 });
 
-// Verificar sessão
+// ==========================================
+// VERIFICAR SESSÃO
+// ==========================================
+
 app.get("/api/auth/me", (req, res) => {
   if (req.session.isAuthenticated) {
     return res.json({
@@ -76,7 +93,10 @@ app.get("/api/auth/me", (req, res) => {
   });
 });
 
-// Middleware de proteção
+// ==========================================
+// MIDDLEWARE DE PROTEÇÃO
+// ==========================================
+
 function requireAuth(req, res, next) {
   if (req.session.isAuthenticated) {
     return next();
@@ -87,25 +107,40 @@ function requireAuth(req, res, next) {
   });
 }
 
-// Google Drive
-const auth = new GoogleAuth({
-  keyFile: process.env.RENDER
-    ? "/etc/secrets/service-account.json"
-    : "./server/credentials/service-account.json",
-  scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-});
+// ==========================================
+// LISTA DE FOTOS
+// ==========================================
 
-const drive = google.drive({
-  version: "v3",
-  auth,
-});
-
-// Lista de fotos (protegida)
 app.get("/api/photos", requireAuth, async (req, res) => {
   try {
     const photos = await getPhotos();
 
-    res.json(photos);
+    const photosWithUrls = await Promise.all(
+      photos.map(async (photo) => {
+        const extension = photo.name.split(".").pop();
+
+        const thumbnailName = photo.name.replace(/\.[^/.]+$/, ".webp");
+
+        const thumbnailKey = `thumbnails/${thumbnailName}`;
+        const originalKey = `originals/${photo.name}`;
+
+        const [thumbnailUrl, originalUrl] = await Promise.all([
+          getR2SignedUrl(thumbnailKey),
+          getR2SignedUrl(originalKey),
+        ]);
+
+        return {
+          id: photo.id,
+          name: photo.name,
+          mimeType: photo.mimeType,
+          extension,
+          thumbnailUrl,
+          originalUrl,
+        };
+      }),
+    );
+
+    res.json(photosWithUrls);
   } catch (error) {
     console.error(error);
 
@@ -115,111 +150,27 @@ app.get("/api/photos", requireAuth, async (req, res) => {
   }
 });
 
-// Thumbnail (protegida)
-app.get("/api/photos/:id/thumbnail", requireAuth, async (req, res) => {
-  try {
-    const response = await drive.files.get({
-      fileId: req.params.id,
-      fields: "thumbnailLink",
-    });
-
-    const thumbnailLink = response.data.thumbnailLink;
-
-    if (!thumbnailLink) {
-      return res.status(404).json({
-        error: "Thumbnail não encontrada",
-      });
-    }
-
-    const thumbnailResponse = await fetch(thumbnailLink);
-
-    if (!thumbnailResponse.ok) {
-      return res.status(500).json({
-        error: "Erro ao obter a thumbnail",
-      });
-    }
-
-    res.setHeader(
-      "Content-Type",
-      thumbnailResponse.headers.get("content-type") || "image/jpeg",
-    );
-
-    const buffer = Buffer.from(await thumbnailResponse.arrayBuffer());
-
-    res.send(buffer);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Erro ao obter a thumbnail",
-    });
-  }
-});
-
-// Imagem original (protegida)
-app.get("/api/photos/:id", requireAuth, async (req, res) => {
-  try {
-    const response = await drive.files.get(
-      {
-        fileId: req.params.id,
-        alt: "media",
-      },
-      {
-        responseType: "stream",
-      },
-    );
-
-    res.setHeader(
-      "Content-Type",
-      response.headers["content-type"] || "image/jpeg",
-    );
-
-    response.data.pipe(res);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Erro ao obter a imagem",
-    });
-  }
-});
-
-// Download (protegido)
-app.get("/api/photos/:id/download", requireAuth, async (req, res) => {
-  try {
-    const response = await drive.files.get(
-      {
-        fileId: req.params.id,
-        alt: "media",
-      },
-      {
-        responseType: "stream",
-      },
-    );
-
-    const fileName = req.query.name || "photo.jpg";
-
-    res.setHeader(
-      "Content-Type",
-      response.headers["content-type"] || "image/jpeg",
-    );
-
-    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
-    response.data.pipe(res);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Erro ao descarregar a imagem",
-    });
-  }
-});
+// ==========================================
+// SPA FALLBACK
+// ==========================================
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
+
+// ==========================================
+// START
+// ==========================================
+
 const PORT = process.env.PORT || 3000;
+
+testR2Connection()
+  .then(() => {
+    console.log("R2 conectado com sucesso");
+  })
+  .catch((error) => {
+    console.error("Erro na ligação ao R2:", error);
+  });
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor a correr na porta ${PORT}`);

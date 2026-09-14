@@ -91,7 +91,7 @@ function Gallery() {
         {photos.map((photo) => (
           <img
             key={photo.id}
-            src={`/api/photos/${photo.id}/thumbnail`}
+            src={photo.thumbnailUrl}
             alt={photo.name}
             onClick={() => setSelectedPhoto(photo)}
             loading="lazy"
@@ -165,14 +165,15 @@ function Gallery() {
           <img
             key={selectedPhoto.id}
             className={styles.fullImage}
-            src={`/api/photos/${selectedPhoto.id}`}
+            src={selectedPhoto.originalUrl}
             alt={selectedPhoto.name}
             onClick={(event) => event.stopPropagation()}
           />
 
           <a
             className={styles.download}
-            href={`/api/photos/${selectedPhoto.id}/download?name=${encodeURIComponent(selectedPhoto.name)}`}
+            href={selectedPhoto.originalUrl}
+            download={selectedPhoto.name}
             onClick={(event) => event.stopPropagation()}
           >
             Download
