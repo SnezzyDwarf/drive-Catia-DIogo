@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
-import session from "express-session";
+import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,29 +15,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ==========================================
+// COOKIE
+// ==========================================
+
+app.use(cookieParser(process.env.SESSION_SECRET));
+
+// ==========================================
 // SERVIR O REACT
 // ==========================================
 
 app.use(express.static(path.join(__dirname, "../dist")));
-
-// ==========================================
-// SESSÃO
-// ==========================================
-
-app.set("trust proxy", 1);
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    },
-  }),
-);
 
 // ==========================================
 // CORS
@@ -64,7 +51,13 @@ app.post("/api/login", (req, res) => {
   const { password } = req.body;
 
   if (password === process.env.GALLERY_PASSWORD) {
-    req.session.isAuthenticated = true;
+    res.cookie("gallery_auth", "authenticated", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      signed: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     return res.json({
       success: true,
@@ -78,11 +71,11 @@ app.post("/api/login", (req, res) => {
 });
 
 // ==========================================
-// VERIFICAR SESSÃO
+// VERIFICAR AUTENTICAÇÃO
 // ==========================================
 
 app.get("/api/auth/me", (req, res) => {
-  if (req.session.isAuthenticated) {
+  if (req.signedCookies.gallery_auth === "authenticated") {
     return res.json({
       isAuthenticated: true,
     });
@@ -98,7 +91,7 @@ app.get("/api/auth/me", (req, res) => {
 // ==========================================
 
 function requireAuth(req, res, next) {
-  if (req.session.isAuthenticated) {
+  if (req.signedCookies.gallery_auth === "authenticated") {
     return next();
   }
 
@@ -164,14 +157,18 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-testR2Connection()
-  .then(() => {
-    console.log("R2 conectado com sucesso");
-  })
-  .catch((error) => {
-    console.error("Erro na ligação ao R2:", error);
-  });
+if (!process.env.VERCEL) {
+  testR2Connection()
+    .then(() => {
+      console.log("R2 conectado com sucesso");
+    })
+    .catch((error) => {
+      console.error("Erro na ligação ao R2:", error);
+    });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Servidor a correr na porta ${PORT}`);
-});
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Servidor a correr na porta ${PORT}`);
+  });
+}
+
+export default app;
