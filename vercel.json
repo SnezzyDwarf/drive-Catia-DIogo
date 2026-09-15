@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -7,6 +9,13 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+
+  "crons": [
+    {
+      "path": "/api/cron/sync-photos",
+      "schedule": "0 4 * * *"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import { migrate } from "./migrateToR2.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -99,6 +100,40 @@ function requireAuth(req, res, next) {
     error: "Não autenticado",
   });
 }
+
+// ==========================================
+// CRON - SINCRONIZAR FOTOS
+// ==========================================
+
+app.get("/api/cron/sync-photos", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({
+      error: "Não autorizado",
+    });
+  }
+
+  try {
+    console.log("Cron: iniciar sincronização de fotos...");
+
+    await migrate();
+
+    console.log("Cron: sincronização terminada.");
+
+    res.json({
+      success: true,
+      message: "Sincronização terminada",
+    });
+  } catch (error) {
+    console.error("Cron: erro na sincronização:", error);
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 
 // ==========================================
 // LISTA DE FOTOS

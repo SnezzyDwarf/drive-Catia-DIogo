@@ -24,27 +24,65 @@ const drive = google.drive({
   auth,
 });
 
-export async function getPhotos() {
-  const photos = [];
+const ROOT_FOLDER_ID = "1_NY0CPR3-_tOp-Evu6s0pJAkplPPeJjY";
+
+async function listFolderContents(folderId) {
+  const files = [];
   let pageToken = null;
 
   do {
     const response = await drive.files.list({
-      q: "'1_NY0CPR3-_tOp-Evu6s0pJAkplPPeJjY' in parents and mimeType contains 'image/' and trashed = false",
-
+      q: `'${folderId}' in parents and trashed = false`,
       fields:
         "nextPageToken, files(id, name, mimeType, thumbnailLink, webContentLink)",
-
       spaces: "drive",
       pageToken,
       pageSize: 100,
     });
 
-    photos.push(...response.data.files);
+    files.push(...response.data.files);
     pageToken = response.data.nextPageToken;
   } while (pageToken);
 
-  photos.sort((a, b) => a.name.localeCompare(b.name));
+  return files;
+}
+
+async function collectPhotos(folderId, folderPath = "") {
+  const contents = await listFolderContents(folderId);
+
+  const photos = [];
+
+  for (const item of contents) {
+    if (item.mimeType === "application/vnd.google-apps.folder") {
+      const nestedPath = folderPath ? `${folderPath}/${item.name}` : item.name;
+
+      const nestedPhotos = await collectPhotos(item.id, nestedPath);
+
+      photos.push(...nestedPhotos);
+      continue;
+    }
+
+    if (item.mimeType?.startsWith("image/")) {
+      photos.push({
+        ...item,
+        folderPath,
+      });
+    }
+  }
+
+  return photos;
+}
+
+export async function getPhotos() {
+  const photos = await collectPhotos(ROOT_FOLDER_ID);
+
+  photos.sort((a, b) => {
+    const pathA = a.folderPath ? `${a.folderPath}/${a.name}` : a.name;
+
+    const pathB = b.folderPath ? `${b.folderPath}/${b.name}` : b.name;
+
+    return pathA.localeCompare(pathB);
+  });
 
   return photos;
 }

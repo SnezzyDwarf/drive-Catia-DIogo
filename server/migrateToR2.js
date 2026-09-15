@@ -11,6 +11,7 @@ const auth = new GoogleAuth({
   keyFile: process.env.RENDER
     ? "/etc/secrets/service-account.json"
     : "./server/credentials/service-account.json",
+
   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 
@@ -19,10 +20,9 @@ const drive = google.drive({
   auth,
 });
 
-async function migrate() {
+export async function migrate() {
   console.log("A procurar fotografias no Google Drive...");
 
-  // TESTE: apenas 3 fotografias
   const photos = await getPhotos();
 
   console.log(`Encontradas ${photos.length} fotografias.`);
@@ -46,29 +46,34 @@ async function migrate() {
       const originalBuffer = Buffer.from(response.data);
 
       // -------------------------
+      // CAMINHO DA PASTA
+      // -------------------------
+
+      const folderPrefix = photo.folderPath ? `${photo.folderPath}/` : "";
+
+      // -------------------------
       // ORIGINAL
       // -------------------------
 
-      const originalKey = `originals/${photo.name}`;
+      const originalKey = `originals/${folderPrefix}${photo.name}`;
 
       const originalExists = await r2FileExists(originalKey);
 
       if (!originalExists) {
         await uploadToR2(originalKey, originalBuffer, photo.mimeType);
 
-        console.log(`✓ Original enviada: ${photo.name}`);
+        console.log(`✓ Original enviada: ${originalKey}`);
       } else {
-        console.log(`✓ Original já existe: ${photo.name}`);
+        console.log(`✓ Original já existe: ${originalKey}`);
       }
 
       // -------------------------
       // THUMBNAIL
       // -------------------------
 
-      const thumbnailKey = `thumbnails/${photo.name.replace(
-        /\.[^/.]+$/,
-        ".webp",
-      )}`;
+      const thumbnailName = photo.name.replace(/\.[^/.]+$/, ".webp");
+
+      const thumbnailKey = `thumbnails/${folderPrefix}${thumbnailName}`;
 
       const thumbnailExists = await r2FileExists(thumbnailKey);
 
@@ -100,9 +105,5 @@ async function migrate() {
     }
   }
 
-  console.log("Migração de teste terminada.");
+  console.log("Migração terminada.");
 }
-
-migrate().catch((error) => {
-  console.error("Erro na migração:", error);
-});
