@@ -8,7 +8,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { getPhotos } from "./googleDrive.js";
-import { testR2Connection, getR2SignedUrl } from "./r2.js";
+import { testR2Connection, getR2SignedUrl, r2FileExists } from "./r2.js";
 
 const app = express();
 
@@ -147,10 +147,22 @@ app.get("/api/photos", requireAuth, async (req, res) => {
       photos.map(async (photo) => {
         const extension = photo.name.split(".").pop();
 
+        // Caminho da pasta
+        const folderPrefix = photo.folderPath ? `${photo.folderPath}/` : "";
+
+        // Nome da thumbnail
         const thumbnailName = photo.name.replace(/\.[^/.]+$/, ".webp");
 
-        const thumbnailKey = `thumbnails/${thumbnailName}`;
-        const originalKey = `originals/${photo.name}`;
+        // Keys do R2
+        const thumbnailKey = `thumbnails/${folderPrefix}${thumbnailName}`;
+        const originalKey = `originals/${folderPrefix}${photo.name}`;
+
+        // Verificar se a thumbnail já foi sincronizada
+        const thumbnailExists = await r2FileExists(thumbnailKey);
+
+        if (!thumbnailExists) {
+          return null;
+        }
 
         const [thumbnailUrl, originalUrl, downloadUrl] = await Promise.all([
           getR2SignedUrl(thumbnailKey),
@@ -166,11 +178,15 @@ app.get("/api/photos", requireAuth, async (req, res) => {
           thumbnailUrl,
           originalUrl,
           downloadUrl,
+          folderPath: photo.folderPath,
         };
       }),
     );
 
-    res.json(photosWithUrls);
+    // Remover fotos que ainda não existem no R2
+    const availablePhotos = photosWithUrls.filter(Boolean);
+
+    res.json(availablePhotos);
   } catch (error) {
     console.error("ERRO API PHOTOS:", error);
 
