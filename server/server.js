@@ -117,9 +117,10 @@ app.get("/api/photos", requireAuth, async (req, res) => {
         const thumbnailKey = `thumbnails/${thumbnailName}`;
         const originalKey = `originals/${photo.name}`;
 
-        const [thumbnailUrl, originalUrl] = await Promise.all([
+        const [thumbnailUrl, originalUrl, downloadUrl] = await Promise.all([
           getR2SignedUrl(thumbnailKey),
           getR2SignedUrl(originalKey),
+          getR2SignedUrl(originalKey, true, photo.name),
         ]);
 
         return {
@@ -129,16 +130,17 @@ app.get("/api/photos", requireAuth, async (req, res) => {
           extension,
           thumbnailUrl,
           originalUrl,
+          downloadUrl,
         };
       }),
     );
 
     res.json(photosWithUrls);
   } catch (error) {
-    console.error(error);
+    console.error("ERRO API PHOTOS:", error);
 
     res.status(500).json({
-      error: "Erro ao obter as fotos",
+      error: error.message,
     });
   }
 });

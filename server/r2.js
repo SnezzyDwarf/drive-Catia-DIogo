@@ -56,11 +56,15 @@ export async function r2FileExists(key) {
     throw error;
   }
 }
-
-export async function getR2SignedUrl(key) {
+export async function getR2SignedUrl(key, download = false, filename = null) {
   const command = new GetObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME,
     Key: key,
+    ...(download && filename
+      ? {
+          ResponseContentDisposition: `attachment; filename="${filename}"`,
+        }
+      : {}),
   });
 
   return await getSignedUrl(r2, command, {

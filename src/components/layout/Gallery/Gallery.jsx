@@ -172,8 +172,7 @@ function Gallery() {
 
           <a
             className={styles.download}
-            href={selectedPhoto.originalUrl}
-            download={selectedPhoto.name}
+            href={selectedPhoto.downloadUrl}
             onClick={(event) => event.stopPropagation()}
           >
             Download
